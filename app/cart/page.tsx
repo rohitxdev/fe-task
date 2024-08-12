@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { LuArrowLeft, LuCheckCircle, LuMinus, LuPlus, LuShoppingCart } from "react-icons/lu";
+import { LuArrowLeft, LuCheckCircle, LuMinus, LuPlus, LuShoppingCart, LuTrash2 } from "react-icons/lu";
 
 const Page = () => {
 	const { cart, updateItem } = useCart();
@@ -40,13 +40,18 @@ const Page = () => {
 								<div className="max-h-64 space-y-2">
 									<h2 className="line-clamp-2 font-semibold text-gray-600">{product.title}</h2>
 									<p className="font-semibold text-lg">&#36;{product.price}</p>
-									<div className="flex w-32 items-center rounded-md border border-gray-300 *:h-full">
-										<button className="p-2" onClick={() => updateItem(product.id, cart[product.id] - 1)}>
-											<LuMinus className="stroke-[3]" />
-										</button>
-										<p className="w-full items-center text-center leading-loose">{cart[product.id]}</p>
-										<button className="p-2" onClick={() => updateItem(product.id, cart[product.id] + 1)}>
-											<LuPlus className="stroke-[3]" />
+									<div className="flex items-center gap-4">
+										<div className="flex w-32 items-center rounded-md border border-gray-300 *:h-full">
+											<button className="p-2" onClick={() => updateItem(product.id, cart[product.id] - 1)}>
+												<LuMinus className="stroke-[3]" />
+											</button>
+											<p className="w-full items-center text-center leading-loose">{cart[product.id]}</p>
+											<button className="p-2" onClick={() => updateItem(product.id, cart[product.id] + 1)}>
+												<LuPlus className="stroke-[3]" />
+											</button>
+										</div>
+										<button className="p-0.5" onClick={() => updateItem(product.id, 0)}>
+											<LuTrash2 className="size-5" />
 										</button>
 									</div>
 									<small className="text-gray-500">Sold by Acme Ltd.</small>
