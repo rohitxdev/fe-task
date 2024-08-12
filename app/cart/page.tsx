@@ -30,7 +30,7 @@ const Page = () => {
 					{cartItems.length > 0 ? (
 						cartItems.map((product, i) => (
 							<div className="flex h-64 gap-4 rounded-md bg-white p-6 shadow-md" key={product.id}>
-								<Image className="rounded object-contain p-2" src={product.image} width={150} height={200} alt={product.title} />
+								<Image className="aspect-square w-full p-2" src={product.image} width={150} height={200} alt={product.title} />
 								<div className="space-y-2">
 									<h2 className="line-clamp-2 font-semibold text-gray-600">{product.title}</h2>
 									<p className="font-semibold text-lg">&#36;{product.price}</p>

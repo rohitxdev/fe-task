@@ -34,7 +34,7 @@ const Page = () => {
 			<div className="mx-auto flex flex-wrap gap-4">
 				{filteredProducts.map((item, i) => (
 					<div className="flex aspect-[3/4] w-64 flex-col space-y-2 rounded-md bg-white p-6 shadow-md max-sm:w-full" key={item.id}>
-						<Image className="h-2/3 self-center" src={item.image} alt={item.title} width={150} height={200} />
+						<Image className="aspect-square w-full self-center" src={item.image} alt={item.title} width={150} height={200} />
 						<h3 className="line-clamp-2 font-semibold text-gray-600">{item.title}</h3>
 						<div className="flex items-center gap-1">
 							{new Array(i % 4 === 0 ? 3 : 4).fill(null).map((_, idx) => (
