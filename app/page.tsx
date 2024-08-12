@@ -33,8 +33,8 @@ const Page = () => {
 			<Search onSearch={setSearch} />
 			<div className="mx-auto flex flex-wrap gap-4">
 				{filteredProducts.map((item, i) => (
-					<div className="flex w-64 flex-col gap-4 rounded-md bg-white p-6 shadow-md max-md:w-full max-md:flex-row" key={item.id}>
-						<Image className="aspect-square w-full self-center max-md:w-2/5" src={item.image} alt={item.title} width={200} height={200} />
+					<div className="flex w-64 flex-col gap-4 rounded-md bg-white p-6 shadow-md max-sm:w-full max-sm:flex-row" key={item.id}>
+						<Image className="aspect-square w-full self-center max-sm:w-2/5" src={item.image} alt={item.title} width={200} height={200} />
 						<div className="flex flex-col space-y-2">
 							<h3 className="line-clamp-2 font-semibold text-gray-600">{item.title}</h3>
 							<div className="flex items-center gap-1">
