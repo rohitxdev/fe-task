@@ -38,9 +38,12 @@ const Page = () => {
 						<div className="flex flex-col space-y-2">
 							<h3 className="line-clamp-2 font-semibold text-gray-600">{item.title}</h3>
 							<div className="flex items-center gap-1">
-								{new Array(i % 4 === 0 ? 3 : 4).fill(null).map((_, idx) => (
-									// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-									<LuStar className="border-none fill-yellow-500 stroke-yellow-600" key={idx} />
+								{new Array(5).fill(null).map((_, idx) => (
+									<LuStar
+										className={`border-none stroke-yellow-600 ${idx < (i % 3 === 0 ? 5 : 4) && "fill-yellow-600"}`}
+										// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+										key={idx}
+									/>
 								))}
 								<span className="ml-1 font-semibold text-gray-600 text-sm">{noOfRatings[i]}</span>
 							</div>
