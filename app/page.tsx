@@ -33,46 +33,48 @@ const Page = () => {
 			<Search onSearch={setSearch} />
 			<div className="mx-auto flex flex-wrap gap-4">
 				{filteredProducts.map((item, i) => (
-					<div className="flex aspect-[3/4] w-64 flex-col space-y-2 rounded-md bg-white p-6 shadow-md max-sm:w-full" key={item.id}>
-						<Image className="aspect-square w-full self-center" src={item.image} alt={item.title} width={150} height={200} />
-						<h3 className="line-clamp-2 font-semibold text-gray-600">{item.title}</h3>
-						<div className="flex items-center gap-1">
-							{new Array(i % 4 === 0 ? 3 : 4).fill(null).map((_, idx) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-								<LuStar className="border-none fill-yellow-500 stroke-yellow-600" key={idx} />
-							))}
-							<span className="ml-1 font-semibold text-gray-600 text-sm">{noOfRatings[i]}</span>
-						</div>
-						<div className="flex items-center justify-between">
-							<span className="font-bold text-lg">&#36;{item.price}</span>
-							{i % 3 === 0 && (
-								<span className="rounded border-green-500 bg-green-300/50 px-1 py-0.5 font-bold text-green-600 text-xs">
-									{i % 2 === 0 ? "30% off" : "50% off"}
-								</span>
+					<div className="flex w-64 flex-col gap-4 rounded-md bg-white p-6 shadow-md max-md:w-full max-md:flex-row" key={item.id}>
+						<Image className="aspect-square w-full self-center max-md:w-2/5" src={item.image} alt={item.title} width={200} height={200} />
+						<div className="flex flex-col space-y-2">
+							<h3 className="line-clamp-2 font-semibold text-gray-600">{item.title}</h3>
+							<div className="flex items-center gap-1">
+								{new Array(i % 4 === 0 ? 3 : 4).fill(null).map((_, idx) => (
+									// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+									<LuStar className="border-none fill-yellow-500 stroke-yellow-600" key={idx} />
+								))}
+								<span className="ml-1 font-semibold text-gray-600 text-sm">{noOfRatings[i]}</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="font-bold text-lg">&#36;{item.price}</span>
+								{i % 3 === 0 && (
+									<span className="rounded border-green-500 bg-green-300/50 px-1 py-0.5 font-bold text-green-600 text-xs">
+										{i % 2 === 0 ? "30% off" : "50% off"}
+									</span>
+								)}
+							</div>
+							{cart[item.id] ? (
+								<div className="flex h-10 w-full items-center justify-evenly rounded-md border border-gray-300 *:h-full">
+									<button className="p-2" onClick={() => updateItem(item.id, cart[item.id] - 1)}>
+										<LuMinus className="stroke-[4]" />
+									</button>
+									<span className="my-auto flex items-center text-center font-semibold">{cart[item.id]}</span>
+									<button className="p-2" onClick={() => updateItem(item.id, cart[item.id] + 1)}>
+										<LuPlus className="stroke-[4]" />
+									</button>
+								</div>
+							) : (
+								<button
+									type="button"
+									className="flex h-10 items-center justify-center gap-2 rounded bg-blue-500 px-4 font-semibold text-white hover:bg-blue-700"
+									onClick={() => {
+										addItem(item.id);
+										toast.success("Added item to cart", { style: { fontWeight: "600" } });
+									}}
+								>
+									Add to cart <LuShoppingCart className="size-4" />
+								</button>
 							)}
 						</div>
-						{cart[item.id] ? (
-							<div className="flex h-10 w-full items-center justify-evenly rounded-md border border-gray-300 *:h-full">
-								<button className="p-2" onClick={() => updateItem(item.id, cart[item.id] - 1)}>
-									<LuMinus className="stroke-[4]" />
-								</button>
-								<p className="items-center text-center font-semibold leading-loose">{cart[item.id]}</p>
-								<button className="p-2" onClick={() => updateItem(item.id, cart[item.id] + 1)}>
-									<LuPlus className="stroke-[4]" />
-								</button>
-							</div>
-						) : (
-							<button
-								type="button"
-								className="flex h-10 items-center justify-center gap-2 rounded bg-blue-500 px-4 font-semibold text-white hover:bg-blue-700"
-								onClick={() => {
-									addItem(item.id);
-									toast.success("Added item to cart", { style: { fontWeight: "600" } });
-								}}
-							>
-								Add to cart <LuShoppingCart className="size-4" />
-							</button>
-						)}
 					</div>
 				))}
 			</div>

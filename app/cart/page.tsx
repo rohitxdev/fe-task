@@ -29,9 +29,15 @@ const Page = () => {
 				<div className="flex w-full max-w-lg flex-col gap-4">
 					{cartItems.length > 0 ? (
 						cartItems.map((product, i) => (
-							<div className="flex h-64 gap-4 rounded-md bg-white p-6 shadow-md" key={product.id}>
-								<Image className="aspect-square w-full p-2" src={product.image} width={150} height={200} alt={product.title} />
-								<div className="space-y-2">
+							<div className="flex gap-4 rounded-md bg-white p-6 shadow-md" key={product.id}>
+								<Image
+									className="contain m-auto aspect-square h-full max-w-[40%] p-2"
+									src={product.image}
+									width={200}
+									height={200}
+									alt={product.title}
+								/>
+								<div className="max-h-64 space-y-2">
 									<h2 className="line-clamp-2 font-semibold text-gray-600">{product.title}</h2>
 									<p className="font-semibold text-lg">&#36;{product.price}</p>
 									<div className="flex w-32 items-center rounded-md border border-gray-300 *:h-full">
@@ -58,7 +64,7 @@ const Page = () => {
 							</div>
 						))
 					) : (
-						<div className="flex h-full w-[240px] flex-col items-center justify-center gap-2 text-center text-gray-600">
+						<div className="mx-auto flex h-full w-[240px] flex-col items-center justify-center gap-2 text-center text-gray-600">
 							<LuShoppingCart className="size-4 stroke-[3]" />
 							<p>Your cart is empty</p>
 						</div>
@@ -69,7 +75,7 @@ const Page = () => {
 					<small className="font-medium text-gray-400 text-xs">use 0FF10 for 10% off</small>
 					<div className="flex items-center gap-2 pb-2">
 						<input
-							className="h-10 bg-gray-100 px-4 outline-black duration-100"
+							className="h-10 w-48 bg-gray-100 px-4 outline-black duration-100"
 							type="text"
 							placeholder="Promo code"
 							onInput={(e) => setPromoCode(e.currentTarget.value)}
