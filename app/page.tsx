@@ -13,7 +13,7 @@ const getRandomInt = (min: number, max: number) => {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-const noOfRatings = new Array(40).fill(null);
+const noOfRatings = new Array(30).fill(null);
 for (let i = 0; i < noOfRatings.length; i++) {
 	noOfRatings[i] = getRandomInt(100, 300);
 }
