@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Suspense, useState } from "react";
 import toast from "react-hot-toast";
 import { LuMinus, LuPlus, LuShoppingCart, LuStar } from "react-icons/lu";
+import { ReactComponent as Spinner } from "../assets/spinner.svg";
 
 const getRandomInt = (min: number, max: number) => {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -25,7 +26,7 @@ const Page = () => {
 	const { cart, addItem, updateItem } = useCart();
 
 	return (
-		<main className="space-y-6">
+		<main className="space-y-4">
 			<nav className="flex justify-end">
 				<Cart />
 			</nav>
@@ -36,7 +37,10 @@ const Page = () => {
 			<div className="mx-auto flex flex-wrap gap-4">
 				{products.length > 0 ? (
 					filteredProducts.map((item, i) => (
-						<div className="flex w-64 flex-col gap-4 rounded-md bg-white p-6 shadow-md max-sm:w-full max-sm:flex-row" key={item.id}>
+						<div
+							className="flex w-64 flex-col gap-4 rounded-md bg-white p-6 shadow-md duration-100 hover:shadow-xl max-sm:w-full max-sm:flex-row"
+							key={item.id}
+						>
 							<Image
 								className="aspect-square w-full self-center max-sm:w-2/5"
 								src={item.image}
@@ -92,6 +96,7 @@ const Page = () => {
 				) : (
 					<div className="flex size-full items-center justify-center font-semibold text-gray-500 text-lg">
 						<p>Loading...</p>
+						<Spinner className="ml-2 size-6" />
 					</div>
 				)}
 			</div>
