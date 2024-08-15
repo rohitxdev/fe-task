@@ -1,6 +1,8 @@
 "use client";
-import { useCart } from "@/contexts/cart-context";
-import { useProducts } from "@/hooks/use-products";
+
+import { ReactComponent as Spinner } from "@/assets/spinner.svg";
+import { useAppContext } from "@/contexts/app-context";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -8,14 +10,23 @@ import toast from "react-hot-toast";
 import { LuArrowLeft, LuCheckCircle, LuMinus, LuPlus, LuShoppingCart, LuTrash2 } from "react-icons/lu";
 
 const Page = () => {
-	const { cart, updateItem } = useCart();
-	const products = useProducts();
+	const { cart, updateCartItem, products } = useAppContext();
 	const [discountPercent, setDiscountPercent] = useState(0);
 	const [promoCode, setPromoCode] = useState("");
+	const { isSignedIn, isLoaded } = useUser();
 
 	const cartItems = products.filter((item) => cart[item.id]);
 	const subTotal = cartItems.reduce((acc, item) => acc + item.price * cart[item.id], 0);
 	const total = ((subTotal * (100 - discountPercent)) / 100).toFixed(2);
+
+	if (!isLoaded || products.length === 0) {
+		return (
+			<div className="flex size-full items-center justify-center font-semibold text-gray-500 text-lg">
+				<p>Loading...</p>
+				<Spinner className="ml-2 size-6" />
+			</div>
+		);
+	}
 
 	return (
 		<main className="mx-auto space-y-6">
@@ -42,15 +53,15 @@ const Page = () => {
 									<p className="font-semibold text-lg">&#36;{product.price}</p>
 									<div className="flex items-center gap-4">
 										<div className="flex w-32 items-center rounded-md border border-gray-300 *:h-full">
-											<button className="p-2" onClick={() => updateItem(product.id, cart[product.id] - 1)}>
+											<button className="p-2" onClick={() => updateCartItem(product.id, cart[product.id] - 1)}>
 												<LuMinus className="stroke-[3]" />
 											</button>
 											<p className="w-full items-center text-center leading-loose">{cart[product.id]}</p>
-											<button className="p-2" onClick={() => updateItem(product.id, cart[product.id] + 1)}>
+											<button className="p-2" onClick={() => updateCartItem(product.id, cart[product.id] + 1)}>
 												<LuPlus className="stroke-[3]" />
 											</button>
 										</div>
-										<button className="p-0.5" onClick={() => updateItem(product.id, 0)}>
+										<button className="p-0.5" onClick={() => updateCartItem(product.id, 0)}>
 											<LuTrash2 className="size-5" />
 										</button>
 									</div>
@@ -112,13 +123,21 @@ const Page = () => {
 					<p>
 						Total: <span className="font-bold text-xl">&#36;{total}</span>
 					</p>
-					<button
-						className="!mt-4 w-full bg-black px-6 py-4 font-bold text-white uppercase disabled:cursor-not-allowed disabled:bg-gray-500"
-						disabled={cartItems.length === 0}
-						onClick={() => toast.success(`Placed order for $${total} successfully`)}
-					>
-						Place order
-					</button>
+					{isSignedIn ? (
+						<button
+							className="!mt-4 w-full bg-black px-6 py-4 font-bold text-white uppercase disabled:cursor-not-allowed disabled:bg-gray-500"
+							disabled={cartItems.length === 0}
+							onClick={() => toast.success(`Placed order for $${total} successfully`)}
+						>
+							Place order
+						</button>
+					) : (
+						<div className="!mt-4 flex w-full justify-center bg-black px-6 py-4 font-bold *:text-white *:uppercase">
+							<SignInButton mode="modal" fallbackRedirectUrl="/?isSignInRedirect=true">
+								Sign in to place order
+							</SignInButton>
+						</div>
+					)}
 				</div>
 			</div>
 		</main>

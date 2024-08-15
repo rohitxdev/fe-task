@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# This is an e-commerce app built as a frontend assignment. It uses Clerk for authentication and Vercel KV for storing cart data. Also implements optimistic UI
 
 ## Getting Started
 
