@@ -3,6 +3,26 @@ import { useSearchParams } from "next/navigation";
 import { type ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { z } from "zod";
 
+const productSchema = z.object({
+	id: z.number(),
+	title: z.string().min(1),
+	price: z.number(),
+	description: z.string().min(1),
+	image: z.string().min(1),
+});
+
+type Product = z.infer<typeof productSchema>;
+
+const fetchProducts = async (callback: (products: Product[]) => void) => {
+	try {
+		const response = await fetch("https://fakestoreapi.in/api/products?limit=30");
+		const data = await response.json();
+		callback(productSchema.array().parse(data.products));
+	} catch (error) {
+		callback([]);
+	}
+};
+
 interface AppContext {
 	cart: Record<number, number>;
 	addCartItem: (id: number) => void;
@@ -12,32 +32,9 @@ interface AppContext {
 
 const AppContext = createContext<AppContext | null>(null);
 
-const productSchema = z.object({
-	id: z.number(),
-	title: z.string().min(1),
-	price: z.number(),
-	description: z.string().min(1),
-	image: z.string().min(1),
-});
-
-const productsSchema = z.array(productSchema);
-
-type Product = z.infer<typeof productSchema>;
-
-const fetchProducts = async (callback: (products: Product[]) => void) => {
-	try {
-		const response = await fetch("https://fakestoreapi.in/api/products?limit=30");
-		const data = await response.json();
-		callback(productsSchema.parse(data.products));
-	} catch (error) {
-		callback([]);
-	}
-	return;
-};
-
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 	const [cart, setCart] = useState<Record<number, number>>({});
-	const [products, setProducts] = useState<z.infer<typeof productSchema>[]>([]);
+	const [products, setProducts] = useState<Product[]>([]);
 	const { isSignedIn } = useUser();
 	const searchParams = useSearchParams();
 	const isSignInRedirect = searchParams.get("isSignInRedirect") === "true";
@@ -64,14 +61,13 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 				fetch("/api/cart", { method: "POST", body: JSON.stringify({ cart: item }) });
 			}
 			localStorage.setItem("cart", JSON.stringify(item));
-
 			return { ...item };
 		});
 	};
 
 	useEffect(() => {
 		const fetchCart = async () => {
-			if (isSignedIn === true) {
+			if (isSignedIn) {
 				const res = await fetch("/api/cart");
 				const data = await res.json();
 				const localCart = JSON.parse(localStorage.getItem("cart") || "{}");
@@ -94,15 +90,16 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 	}, [isSignedIn, isSignInRedirect]);
 
 	useEffect(() => {
-		const localData = sessionStorage.getItem("products");
+		//Cache products in local storage
+		const localData = localStorage.getItem("products");
 		if (localData) {
-			setProducts(productsSchema.parse(JSON.parse(localData)));
+			setProducts(productSchema.array().parse(JSON.parse(localData)));
 			return;
 		}
 
 		fetchProducts((data) => {
 			setProducts(data);
-			sessionStorage.setItem("products", JSON.stringify(data));
+			localStorage.setItem("products", JSON.stringify(data));
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

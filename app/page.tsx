@@ -1,18 +1,16 @@
 "use client";
+import { Fallback } from "@/components/fallback";
 import { Nav } from "@/components/nav";
 import { Search } from "@/components/search";
 import { useAppContext } from "@/contexts/app-context";
+import { getRandomInt } from "@/utils/misc";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { LuMinus, LuPlus, LuShoppingCart, LuStar } from "react-icons/lu";
-import { ReactComponent as Spinner } from "../assets/spinner.svg";
 
-const getRandomInt = (min: number, max: number) => {
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
+//Generate random ratings for products
 const noOfRatings = new Array(30).fill(null);
 
 for (let i = 0; i < noOfRatings.length; i++) {
@@ -20,19 +18,14 @@ for (let i = 0; i < noOfRatings.length; i++) {
 }
 
 const Page = () => {
-	const [search, setSearch] = useState<string>("");
+	const { products, cart, addCartItem, updateCartItem } = useAppContext();
+	const [search, setSearch] = useState("");
 	const { isLoaded } = useUser();
 	const regex = new RegExp(search, "i");
-	const { products, cart, addCartItem, updateCartItem } = useAppContext();
 	const filteredProducts = products.filter((item) => regex.test(item.title));
 
 	if (!isLoaded || products.length === 0) {
-		return (
-			<div className="flex size-full items-center justify-center font-semibold text-gray-500 text-lg">
-				<p>Loading...</p>
-				<Spinner className="ml-2 size-6" />
-			</div>
-		);
+		return <Fallback />;
 	}
 
 	return (

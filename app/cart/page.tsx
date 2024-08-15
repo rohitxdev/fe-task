@@ -1,6 +1,5 @@
 "use client";
-
-import { ReactComponent as Spinner } from "@/assets/spinner.svg";
+import { Fallback } from "@/components/fallback";
 import { useAppContext } from "@/contexts/app-context";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
@@ -20,12 +19,7 @@ const Page = () => {
 	const total = ((subTotal * (100 - discountPercent)) / 100).toFixed(2);
 
 	if (!isLoaded || products.length === 0) {
-		return (
-			<div className="flex size-full items-center justify-center font-semibold text-gray-500 text-lg">
-				<p>Loading...</p>
-				<Spinner className="ml-2 size-6" />
-			</div>
-		);
+		return <Fallback />;
 	}
 
 	return (
