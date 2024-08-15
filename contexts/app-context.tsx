@@ -37,7 +37,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 			setProducts(validProducts);
 			localStorage.setItem("products", JSON.stringify(validProducts));
 		} catch (error) {
-			setCart([]);
+			setProducts([]);
 		}
 	};
 
