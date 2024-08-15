@@ -13,16 +13,6 @@ const productSchema = z.object({
 
 type Product = z.infer<typeof productSchema>;
 
-const fetchProducts = async (callback: (products: Product[]) => void) => {
-	try {
-		const response = await fetch("https://fakestoreapi.in/api/products?limit=30");
-		const data = await response.json();
-		callback(productSchema.array().parse(data.products));
-	} catch (error) {
-		callback([]);
-	}
-};
-
 interface AppContext {
 	cart: Record<number, number>;
 	addCartItem: (id: number) => void;
@@ -38,6 +28,18 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 	const { isSignedIn } = useUser();
 	const searchParams = useSearchParams();
 	const isSignInRedirect = searchParams.get("isSignInRedirect") === "true";
+
+	const fetchProducts = async () => {
+		try {
+			const response = await fetch("https://fakestoreapi.in/api/products?limit=30");
+			const data = await response.json();
+			const validProducts = productSchema.array().parse(data.products);
+			setProducts(validProducts);
+			localStorage.setItem("products", JSON.stringify(validProducts));
+		} catch (error) {
+			setCart([]);
+		}
+	};
 
 	const addCartItem = (id: number) => {
 		setCart((item) => {
@@ -89,6 +91,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 		fetchCart();
 	}, [isSignedIn, isSignInRedirect]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		//Cache products in local storage
 		const localData = localStorage.getItem("products");
@@ -97,11 +100,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 			return;
 		}
 
-		fetchProducts((data) => {
-			setProducts(data);
-			localStorage.setItem("products", JSON.stringify(data));
-		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		fetchProducts();
 	}, []);
 
 	return <AppContext.Provider value={{ products, cart, addCartItem, updateCartItem }}>{children}</AppContext.Provider>;
