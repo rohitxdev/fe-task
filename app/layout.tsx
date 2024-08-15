@@ -3,7 +3,7 @@ import { AppContextProvider } from "@/contexts/app-context";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Space_Grotesk } from "next/font/google";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -13,9 +13,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
 		<html lang="en">
 			<body className="min-h-screen bg-gray-100 p-6 text-black" style={spaceGrotesk.style}>
 				<Toaster />
-				<ClerkProvider>
-					<AppContextProvider>{children}</AppContextProvider>
-				</ClerkProvider>
+				<Suspense>
+					<ClerkProvider>
+						<AppContextProvider>{children}</AppContextProvider>
+					</ClerkProvider>
+				</Suspense>
 			</body>
 		</html>
 	);

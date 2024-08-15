@@ -4,7 +4,7 @@ import { Search } from "@/components/search";
 import { useAppContext } from "@/contexts/app-context";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { LuMinus, LuPlus, LuShoppingCart, LuStar } from "react-icons/lu";
 import { ReactComponent as Spinner } from "../assets/spinner.svg";
@@ -39,9 +39,7 @@ const Page = () => {
 		<main className="space-y-4">
 			<Nav />
 			<h1 className="font-bold text-4xl">Products</h1>
-			<Suspense>
-				<Search onSearch={setSearch} />
-			</Suspense>
+			<Search onSearch={setSearch} />
 			<div className="mx-auto flex flex-wrap gap-4">
 				{filteredProducts.map((item, i) => (
 					<div
