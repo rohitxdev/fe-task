@@ -1,29 +1,35 @@
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import { type ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { z } from "zod";
+import { string, z } from "zod";
 
 const productSchema = z.object({
-	id: z.number(),
-	title: z.string().min(1),
-	price: z.number(),
+	id: z.string().min(1),
+	name: z.string().min(1),
 	description: z.string().min(1),
-	image: z.string().min(1),
+	imageUrl: z.string().min(1),
+	prices: z.array(
+		z.object({
+			id: string().min(1),
+			productId: z.string().min(1),
+			unitPrice: z.object({ amount: z.string().min(1), currencyCode: z.string().min(1) }),
+		}),
+	),
 });
 
 type Product = z.infer<typeof productSchema>;
 
 interface AppContext {
-	cart: Record<number, number>;
-	addCartItem: (id: number) => void;
-	updateCartItem: (id: number, quantity: number) => void;
+	cart: Record<string, number>;
+	addCartItem: (id: string) => void;
+	updateCartItem: (id: string, quantity: number) => void;
 	products: Product[];
 }
 
 const AppContext = createContext<AppContext | null>(null);
 
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
-	const [cart, setCart] = useState<Record<number, number>>({});
+	const [cart, setCart] = useState<Record<string, number>>({});
 	const [products, setProducts] = useState<Product[]>([]);
 	const { isSignedIn } = useUser();
 	const searchParams = useSearchParams();
@@ -31,17 +37,19 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
 	const fetchProducts = async () => {
 		try {
-			const response = await fetch("https://fakestoreapi.in/api/products?limit=30");
+			const response = await fetch("/api/products");
 			const data = await response.json();
-			const validProducts = productSchema.array().parse(data.products);
+			const validProducts = productSchema.array().parse(data);
 			setProducts(validProducts);
 			localStorage.setItem("products", JSON.stringify(validProducts));
 		} catch (error) {
+			console.log(error);
+
 			setProducts([]);
 		}
 	};
 
-	const addCartItem = (id: number) => {
+	const addCartItem = (id: string) => {
 		setCart((item) => {
 			item[id] = 1;
 			if (isSignedIn) {
@@ -52,7 +60,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 		});
 	};
 
-	const updateCartItem = (id: number, quantity: number) => {
+	const updateCartItem = (id: string, quantity: number) => {
 		setCart((item) => {
 			if (quantity > 0) {
 				item[id] = quantity;
@@ -93,13 +101,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		//Cache products in local storage
-		const localData = localStorage.getItem("products");
-		if (localData) {
-			setProducts(productSchema.array().parse(JSON.parse(localData)));
-			return;
-		}
-
 		fetchProducts();
 	}, []);
 

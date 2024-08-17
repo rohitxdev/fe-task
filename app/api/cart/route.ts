@@ -16,6 +16,7 @@ export const POST = async (req: Request) => {
 
 	const body = await req.json();
 	const cart = body?.cart;
+
 	if (!cart) return new Response(null, { status: 422 });
 
 	await kv.set(userId, JSON.stringify(cart));

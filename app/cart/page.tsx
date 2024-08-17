@@ -2,21 +2,46 @@
 import { Fallback } from "@/components/fallback";
 import { useAppContext } from "@/contexts/app-context";
 import { SignInButton, useUser } from "@clerk/nextjs";
+import { CheckoutEventNames, type Paddle, initializePaddle } from "@paddle/paddle-js";
 import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { LuArrowLeft, LuCheckCircle, LuMinus, LuPlus, LuShoppingCart, LuTrash2 } from "react-icons/lu";
+import { LuCheckCircle, LuMinus, LuPlus, LuShoppingCart, LuTrash2 } from "react-icons/lu";
 
 const Page = () => {
 	const { cart, updateCartItem, products } = useAppContext();
 	const [discountPercent, setDiscountPercent] = useState(0);
 	const [promoCode, setPromoCode] = useState("");
 	const { isSignedIn, isLoaded } = useUser();
+	const paddle = useRef<Paddle | null>(null);
 
 	const cartItems = products.filter((item) => cart[item.id]);
-	const subTotal = cartItems.reduce((acc, item) => acc + item.price * cart[item.id], 0);
+	const subTotal = cartItems.reduce((acc, item) => acc + (Number.parseInt(item.prices[0]!.unitPrice.amount) / 100) * cart[item.id], 0);
 	const total = ((subTotal * (100 - discountPercent)) / 100).toFixed(2);
+
+	useEffect(() => {
+		const initPaddle = async () => {
+			const res = await initializePaddle({
+				token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!,
+				eventCallback: (e) => {
+					if (e.name === CheckoutEventNames.CHECKOUT_COMPLETED) {
+						paddle?.current?.Checkout.close();
+						for (const item in cart) {
+							updateCartItem(item, 0);
+						}
+						setDiscountPercent(0);
+						toast.success("Placed order successfully");
+					}
+				},
+			});
+			if (!res) return;
+
+			res.Environment.set("sandbox");
+			paddle.current = res;
+		};
+
+		initPaddle();
+	}, [cart, updateCartItem]);
 
 	if (!isLoaded || products.length === 0) {
 		return <Fallback />;
@@ -24,11 +49,6 @@ const Page = () => {
 
 	return (
 		<main className="mx-auto space-y-6">
-			<nav className="flex items-center justify-start">
-				<Link aria-label="Back to products" href="/">
-					<LuArrowLeft className="size-6 stroke-[3]" />
-				</Link>
-			</nav>
 			<h1 className="text-center font-bold text-4xl">Cart</h1>
 			<div className={`flex flex-wrap justify-center ${cartItems.length > 0 ? "items-start" : "items-stretch"} gap-6`}>
 				<div className="flex w-full max-w-lg flex-col gap-4">
@@ -37,14 +57,14 @@ const Page = () => {
 							<div className="flex gap-4 rounded-md bg-white p-6 shadow-md" key={product.id}>
 								<Image
 									className="contain m-auto aspect-square h-full max-w-[40%] p-2"
-									src={product.image}
+									src={product.imageUrl}
 									width={200}
 									height={200}
-									alt={product.title}
+									alt={product.name}
 								/>
 								<div className="max-h-64 space-y-2">
-									<h2 className="line-clamp-2 font-semibold text-gray-600">{product.title}</h2>
-									<p className="font-semibold text-lg">&#36;{product.price}</p>
+									<h2 className="line-clamp-2 font-semibold text-gray-600">{product.name}</h2>
+									<p className="font-semibold text-lg">&#36;{Number.parseInt(product.prices[0]!.unitPrice.amount) / 100}</p>
 									<div className="flex items-center gap-4">
 										<div className="flex w-32 items-center rounded-md border border-gray-300 *:h-full">
 											<button className="p-2" onClick={() => updateCartItem(product.id, cart[product.id] - 1)}>
@@ -81,8 +101,8 @@ const Page = () => {
 					)}
 				</div>
 				<div className="w-full max-w-sm space-y-2 rounded-md bg-white p-6 shadow-md">
-					<h2 className="font-semibold text-2xl">Checkout</h2>
-					<small className="font-medium text-gray-400 text-xs">use 0FF10 for 10% off</small>
+					<h2 className="font-semibold text-2xl">Cart summary</h2>
+					<small className="font-medium text-gray-400 text-xs">use 0FF10 to get 10% off</small>
 					<div className="flex items-center gap-2 pb-2">
 						<input
 							className="h-10 w-48 bg-gray-100 px-4 outline-black duration-100"
@@ -94,13 +114,12 @@ const Page = () => {
 						<button
 							className="h-10 rounded bg-black px-4 py-2 font-semibold text-sm text-white"
 							onClick={() => {
-								if (!promoCode) return;
 								if (promoCode === "OFF10") {
 									setDiscountPercent(10);
 									toast.success("Discount applied");
-									setPromoCode("");
 									return;
 								}
+								setDiscountPercent(0);
 								toast.error("Invalid promo code");
 							}}
 						>
@@ -121,14 +140,22 @@ const Page = () => {
 						<button
 							className="!mt-4 w-full bg-black px-6 py-4 font-bold text-white uppercase disabled:cursor-not-allowed disabled:bg-gray-500"
 							disabled={cartItems.length === 0}
-							onClick={() => toast.success(`Placed order for $${total} successfully`)}
+							onClick={() => {
+								paddle.current?.Checkout.open({
+									discountCode: promoCode,
+									items: cartItems.map((item) => ({
+										priceId: products.find((product) => product.id === item.id)?.prices[0].id!,
+										quantity: cart[item.id],
+									})),
+								});
+							}}
 						>
-							Place order
+							Checkout
 						</button>
 					) : (
 						<div className="!mt-4 flex w-full justify-center bg-black px-6 py-4 font-bold *:text-white *:uppercase">
 							<SignInButton mode="modal" fallbackRedirectUrl="/?isSignInRedirect=true">
-								Sign in to place order
+								Sign in to checkout
 							</SignInButton>
 						</div>
 					)}

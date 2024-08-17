@@ -1,6 +1,7 @@
 "use client";
 import { AppContextProvider } from "@/contexts/app-context";
 import "./globals.css";
+import { Nav } from "@/components/nav";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Space_Grotesk } from "next/font/google";
 import { type ReactNode, Suspense } from "react";
@@ -15,7 +16,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
 				<Toaster />
 				<Suspense>
 					<ClerkProvider>
-						<AppContextProvider>{children}</AppContextProvider>
+						<AppContextProvider>
+							<Nav />
+							{children}
+						</AppContextProvider>
 					</ClerkProvider>
 				</Suspense>
 			</body>

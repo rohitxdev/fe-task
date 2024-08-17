@@ -1,6 +1,5 @@
 "use client";
 import { Fallback } from "@/components/fallback";
-import { Nav } from "@/components/nav";
 import { Search } from "@/components/search";
 import { useAppContext } from "@/contexts/app-context";
 import { getRandomInt } from "@/utils/misc";
@@ -22,7 +21,7 @@ const Page = () => {
 	const [search, setSearch] = useState("");
 	const { isLoaded } = useUser();
 	const regex = new RegExp(search, "i");
-	const filteredProducts = products.filter((item) => regex.test(item.title));
+	const filteredProducts = products.filter((item) => regex.test(item.name));
 
 	if (!isLoaded || products.length === 0) {
 		return <Fallback />;
@@ -30,7 +29,6 @@ const Page = () => {
 
 	return (
 		<main className="space-y-4">
-			<Nav />
 			<h1 className="font-bold text-4xl">Products</h1>
 			<Search onSearch={setSearch} />
 			<div className="mx-auto flex flex-wrap gap-4">
@@ -39,9 +37,15 @@ const Page = () => {
 						className="flex w-64 flex-col gap-4 rounded-md bg-white p-6 shadow-md duration-100 hover:shadow-xl max-sm:w-full max-sm:flex-row"
 						key={item.id}
 					>
-						<Image className="aspect-square w-full self-center max-sm:w-2/5" src={item.image} alt={item.title} width={200} height={200} />
+						<Image
+							className="aspect-square w-full self-center max-sm:w-2/5"
+							src={item.imageUrl}
+							alt={item.name}
+							width={200}
+							height={200}
+						/>
 						<div className="flex flex-col space-y-2 max-sm:w-40">
-							<h3 className="line-clamp-2 font-semibold text-gray-600">{item.title}</h3>
+							<h3 className="line-clamp-2 font-semibold text-gray-600">{item.name}</h3>
 							<div className="flex items-center gap-1">
 								{new Array(5).fill(null).map((_, idx) => (
 									<LuStar
@@ -53,7 +57,7 @@ const Page = () => {
 								<span className="ml-1 font-semibold text-gray-600 text-sm">{noOfRatings[i]}</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="font-bold text-lg">&#36;{item.price}</span>
+								<span className="font-bold text-lg">&#36;{Number.parseInt(item.prices[0]!.unitPrice.amount) / 100}</span>
 								{i % 3 === 0 && (
 									<span className="rounded border-green-500 bg-green-300/50 px-1 py-0.5 font-bold text-green-600 text-xs">
 										{i % 2 === 0 ? "30% off" : "50% off"}
