@@ -31,10 +31,10 @@ const Page = () => {
 		<main className="space-y-4">
 			<h1 className="font-bold text-4xl">Products</h1>
 			<Search onSearch={setSearch} />
-			<div className="mx-auto flex flex-wrap gap-4">
+			<div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4 max-sm:grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
 				{filteredProducts.map((item, i) => (
 					<div
-						className="flex w-64 flex-col gap-4 rounded-md bg-white p-6 shadow-md duration-100 hover:shadow-xl max-sm:w-full max-sm:flex-row"
+						className="flex flex-col gap-4 rounded-md bg-white p-6 shadow-md duration-100 hover:shadow-xl max-sm:w-full max-sm:flex-row"
 						key={item.id}
 					>
 						<Image

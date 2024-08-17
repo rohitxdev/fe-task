@@ -36,7 +36,9 @@ const Page = () => {
 			});
 			if (!res) return;
 
-			res.Environment.set("sandbox");
+			if (process.env.VERCEL_ENV === "development") {
+				res.Environment.set("sandbox");
+			}
 			paddle.current = res;
 		};
 
