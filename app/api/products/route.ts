@@ -1,5 +1,7 @@
 import { paddle } from "@/utils/payments";
 
+export const dynamic = "force-dynamic";
+
 export const GET = async (req: Request) => {
 	const productsCollection = paddle.products.list({ include: ["prices"] });
 	const products = await productsCollection.next();
