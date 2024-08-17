@@ -2,7 +2,7 @@
 import { Fallback } from "@/components/fallback";
 import { useAppContext } from "@/contexts/app-context";
 import { SignInButton, useUser } from "@clerk/nextjs";
-import { CheckoutEventNames, type Paddle, initializePaddle } from "@paddle/paddle-js";
+import { CheckoutEventNames, type Environments, type Paddle, initializePaddle } from "@paddle/paddle-js";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -36,9 +36,7 @@ const Page = () => {
 			});
 			if (!res) return;
 
-			if (process.env.VERCEL_ENV === "development") {
-				res.Environment.set("sandbox");
-			}
+			res.Environment.set(process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT! as Environments);
 			paddle.current = res;
 		};
 
