@@ -12,7 +12,7 @@ const Page = () => {
 	const { cart, updateCartItem, products } = useAppContext();
 	const [discountPercent, setDiscountPercent] = useState(0);
 	const [promoCode, setPromoCode] = useState("");
-	const { isSignedIn, isLoaded } = useUser();
+	const { isSignedIn, isLoaded, user } = useUser();
 	const paddle = useRef<Paddle | null>(null);
 
 	const cartItems = products.filter((item) => cart[item.id]);
@@ -105,15 +105,21 @@ const Page = () => {
 					<small className="font-medium text-gray-400 text-xs">use 0FF10 to get 10% off</small>
 					<div className="flex items-center gap-2 pb-2">
 						<input
-							className="h-10 w-48 bg-gray-100 px-4 outline-black duration-100"
+							className="h-10 w-48 bg-gray-100 px-4 outline-black duration-100 disabled:cursor-not-allowed disabled:bg-gray-300"
 							type="text"
 							placeholder="Promo code"
 							onInput={(e) => setPromoCode(e.currentTarget.value)}
 							value={promoCode}
+							disabled={discountPercent > 0}
 						/>
 						<button
 							className="h-10 rounded bg-black px-4 py-2 font-semibold text-sm text-white"
 							onClick={() => {
+								if (discountPercent > 0) {
+									setPromoCode("");
+									setDiscountPercent(0);
+									return;
+								}
 								if (promoCode === "OFF10") {
 									setDiscountPercent(10);
 									toast.success("Discount applied");
@@ -123,7 +129,7 @@ const Page = () => {
 								toast.error("Invalid promo code");
 							}}
 						>
-							Apply
+							{discountPercent > 0 ? "Remove" : "Apply"}
 						</button>
 					</div>
 					<p className="text-gray-600 text-sm">
@@ -142,7 +148,11 @@ const Page = () => {
 							disabled={cartItems.length === 0}
 							onClick={() => {
 								paddle.current?.Checkout.open({
-									discountCode: promoCode,
+									discountCode: discountPercent > 0 ? promoCode : "",
+									customer: {
+										email: user.emailAddresses[0].emailAddress,
+									},
+									settings: { allowDiscountRemoval: false },
 									items: cartItems.map((item) => ({
 										priceId: products.find((product) => product.id === item.id)?.prices[0].id!,
 										quantity: cart[item.id],
