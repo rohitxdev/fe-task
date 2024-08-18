@@ -105,7 +105,7 @@ const Page = () => {
 					<small className="font-medium text-gray-400 text-xs">use 0FF10 to get 10% off</small>
 					<div className="flex items-center gap-2 pb-2">
 						<input
-							className="h-10 w-48 bg-gray-100 px-4 outline-black duration-100 disabled:cursor-not-allowed disabled:bg-gray-300"
+							className="h-10 w-48 rounded bg-gray-100 px-4 outline-black duration-100 disabled:cursor-not-allowed disabled:bg-gray-300"
 							type="text"
 							placeholder="Promo code"
 							onInput={(e) => setPromoCode(e.currentTarget.value)}
@@ -144,7 +144,7 @@ const Page = () => {
 					</p>
 					{isSignedIn ? (
 						<button
-							className="!mt-4 w-full bg-black px-6 py-4 font-bold text-white uppercase disabled:cursor-not-allowed disabled:bg-gray-500"
+							className="!mt-4 w-full rounded bg-black px-6 py-4 font-bold text-white uppercase disabled:cursor-not-allowed disabled:bg-gray-500"
 							disabled={cartItems.length === 0}
 							onClick={() => {
 								paddle.current?.Checkout.open({
@@ -163,7 +163,7 @@ const Page = () => {
 							Checkout
 						</button>
 					) : (
-						<div className="!mt-4 flex w-full justify-center bg-black px-6 py-4 font-bold *:text-white *:uppercase">
+						<div className="!mt-4 flex w-full justify-center rounded bg-black px-6 py-4 font-bold *:text-white *:uppercase">
 							<SignInButton mode="modal" fallbackRedirectUrl="/?isSignInRedirect=true">
 								Sign in to checkout
 							</SignInButton>
