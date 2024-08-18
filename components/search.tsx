@@ -1,6 +1,6 @@
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { LuSearch, LuX } from "react-icons/lu";
 
 interface SearchProps {
@@ -14,23 +14,18 @@ export const Search = (props: SearchProps) => {
 
 	useEffect(() => {
 		props.onSearch(value);
+	}, [value, props]);
+
+	useLayoutEffect(() => {
 		const url = new URL(location.href);
 		url.searchParams.set("search", value);
 		router.replace(url.toString());
-	}, [value, router.replace, props]);
+	}, [value, router]);
 
 	return (
 		<label className="flex w-fit items-center gap-2 rounded-md bg-white px-2 shadow-md outline-gray-600 focus-within:outline">
 			<LuSearch />
-			<input
-				className="h-9 outline-none"
-				type="text"
-				placeholder="Search"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			/>
+			<input className="h-9 outline-none" type="text" placeholder="Search" onChange={(e) => setValue(e.target.value)} value={value} />
 			<button
 				className={`text-gray-700 ${value.length === 0 && "invisible"}`}
 				aria-label="Clear search"

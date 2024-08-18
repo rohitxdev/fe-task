@@ -1,11 +1,12 @@
 "use client";
 import { Fallback } from "@/components/fallback";
+import { Filter } from "@/components/filter";
 import { Search } from "@/components/search";
 import { useAppContext } from "@/contexts/app-context";
 import { getRandomInt } from "@/utils/misc";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import { useState } from "react";
+import { type ComponentProps, useState } from "react";
 import toast from "react-hot-toast";
 import { LuMinus, LuPlus, LuShoppingCart, LuStar } from "react-icons/lu";
 
@@ -14,10 +15,20 @@ const noOfRatings = new Array(30).fill(null).map(() => getRandomInt(100, 300));
 
 const Page = () => {
 	const { products, cart, addCartItem, updateCartItem } = useAppContext();
-	const [search, setSearch] = useState("");
 	const { isLoaded } = useUser();
+	const [search, setSearch] = useState("");
+	const [filter, setFilter] = useState<Parameters<ComponentProps<typeof Filter>["onFilter"]>[0] | null>(null);
 	const regex = new RegExp(search, "i");
-	const filteredProducts = products.filter((item) => regex.test(item.name));
+	const filteredProducts = products.filter((item) => {
+		if (filter === null) {
+			return regex.test(item.name);
+		}
+		return (
+			regex.test(item.name) &&
+			filter.price.min <= Number.parseInt(item.prices[0]!.unitPrice.amount) / 100 &&
+			filter.price.max >= Number.parseInt(item.prices[0]!.unitPrice.amount) / 100
+		);
+	});
 
 	if (!isLoaded || products.length === 0) {
 		return <Fallback />;
@@ -26,7 +37,10 @@ const Page = () => {
 	return (
 		<main className="space-y-4">
 			<h1 className="font-bold text-4xl">Products</h1>
-			<Search onSearch={setSearch} />
+			<div className="flex items-center justify-between gap-2">
+				<Search onSearch={setSearch} />
+				<Filter onFilter={setFilter} />
+			</div>
 			<div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4 max-sm:grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
 				{filteredProducts.map((item, i) => (
 					<div
