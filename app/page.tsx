@@ -10,11 +10,7 @@ import toast from "react-hot-toast";
 import { LuMinus, LuPlus, LuShoppingCart, LuStar } from "react-icons/lu";
 
 //Generate random ratings for products
-const noOfRatings = new Array(30).fill(null);
-
-for (let i = 0; i < noOfRatings.length; i++) {
-	noOfRatings[i] = getRandomInt(100, 300);
-}
+const noOfRatings = new Array(30).fill(null).map(() => getRandomInt(100, 300));
 
 const Page = () => {
 	const { products, cart, addCartItem, updateCartItem } = useAppContext();
