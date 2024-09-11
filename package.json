@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.3.1",
+    "@clerk/nextjs": "^5.5.2",
     "@paddle/paddle-js": "^1.2.1",
     "@paddle/paddle-node-sdk": "^1.5.0",
     "@vercel/kv": "^2.0.0",
